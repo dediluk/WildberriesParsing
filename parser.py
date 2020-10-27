@@ -9,6 +9,7 @@ logger = logging.getLogger('wb')
 ParseResult = collections.namedtuple('ParseResult', ('brand_name', 'goods_name', 'url', 'price'))
 HEADERS = ("Бренд", "Товар", "Ссылка", 'Цена')
 
+
 class Client:
     def __init__(self):
         self.session = requests.Session()
@@ -17,8 +18,8 @@ class Client:
         }
         self.result = []
 
-    def load_page(self):
-        url = 'https://www.wildberries.by/catalog/muzhchinam/odezhda/vodolazki'
+    def load_page(self, i):
+        url = f'https://by.wildberries.ru/catalog/muzhchinam/odezhda/vodolazki?page={i}'
         res = self.session.get(url=url)
         res.raise_for_status()
         return res.text
@@ -78,9 +79,10 @@ class Client:
                 writer.writerow(item)
 
     def run(self):
-        text = self.load_page()
-        self.parse_page(text=text)
-        logger.info(f'Get {len(self.result)}')
+        for i in range(1, 23):
+            text = self.load_page(i)
+            self.parse_page(text=text)
+            logger.info(f'Get {len(self.result)}')
         self.save_results()
 
 
